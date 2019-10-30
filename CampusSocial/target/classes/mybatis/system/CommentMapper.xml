@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.social.project.system.comment.mapper.CommentMapper">
+    
+    <resultMap type="Comment" id="CommentResult">
+        <result property="id"    column="id"    />
+        <result property="content"    column="content"    />
+        <result property="noticeId"    column="notice_id"    />
+        <result property="replySign"    column="reply_sign"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+	
+	<sql id="selectCommentVo">
+        select id, content, notice_id,reply_sign,create_by, create_time, update_by, update_time, del_flag, remark from cap_comment
+    </sql>
+	
+    <select id="selectCommentList" parameterType="Comment" resultMap="CommentResult">
+        <include refid="selectCommentVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="content != null  and content != '' "> and content = #{content}</if>
+             <if test="noticeId != null "> and notice_id = #{noticeId}</if>
+             <if test="createBy != null  and createBy != '' "> and create_by = #{createBy}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+             <if test="updateBy != null  and updateBy != '' "> and update_by = #{updateBy}</if>
+             <if test="updateTime != null "> and update_time = #{updateTime}</if>
+              and del_flag = '0'
+             <if test="remark != null  and remark != '' "> and remark = #{remark}</if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+            </if>
+         </where>
+    </select>
+    
+    <select id="selectCommentById" parameterType="Integer" resultMap="CommentResult">
+        <include refid="selectCommentVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertComment" parameterType="Comment" useGeneratedKeys="true" keyProperty="id">
+        insert into cap_comment
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="content != null  and content != ''  ">content,</if>
+			<if test="noticeId != null  ">notice_id,</if>
+			<if test="replySign != null  ">reply_sign,</if>
+			<if test="createBy != null  and createBy != ''  ">create_by,</if>
+			create_time
+			<if test="delFlag != null  and delFlag != ''  ">del_flag,</if>
+			<if test="remark != null  and remark != ''  ">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="content != null  and content != ''  ">#{content},</if>
+			<if test="noticeId != null  ">#{noticeId},</if>
+			<if test="replySign != null  ">#{replySign},</if>
+			<if test="createBy != null  and createBy != ''  ">#{createBy},</if>
+            sysdate()
+			<if test="delFlag != null  and delFlag != ''  ">#{delFlag},</if>
+			<if test="remark != null  and remark != ''  ">#{remark},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateComment" parameterType="Comment">
+        update cap_comment
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="content != null  and content != ''  ">content = #{content},</if>
+            <if test="noticeId != null  ">notice_id = #{noticeId},</if>
+            <if test="replySign != null  ">reply_sign = #{replySign},</if>
+            <if test="updateBy != null  and updateBy != ''  ">update_by = #{updateBy},</if>
+            update_time = sysdate()
+            <if test="delFlag != null  and delFlag != ''  ">del_flag = #{delFlag},</if>
+            <if test="remark != null  and remark != ''  ">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteCommentById" parameterType="Integer">
+        update cap_comment set del_flag = '2' where id = #{id}
+    </delete>
+	
+    <delete id="deleteCommentByIds" parameterType="String">
+        update cap_comment set del_flag = '2' where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

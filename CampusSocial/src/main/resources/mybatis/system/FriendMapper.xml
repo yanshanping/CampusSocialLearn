@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.social.project.system.friend.mapper.FriendMapper">
+    
+    <resultMap type="Friend" id="FriendResult">
+        <result property="id"    column="id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="userGroup"    column="user_group"    />
+        <result property="friendId"    column="friend_id"    />
+        <result property="friendGroup"    column="friend_group"    />
+        <result property="friendRemark"    column="friend_remark"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+	
+	<sql id="selectFriendVo">
+        select id, user_id, user_group, friend_id, friend_group, friend_remark,create_by, create_time, update_by, update_time from cap_friend
+    </sql>
+	
+    <select id="selectFriendList" parameterType="Friend" resultMap="FriendResult">
+        <include refid="selectFriendVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="userId != null "> and user_id = #{userId}</if>
+             <if test="userGroup != null  and userGroup != '' "> and user_group = #{userGroup}</if>
+             <if test="friendId != null "> and friend_id = #{friendId}</if>
+             <if test="friendGroup != null  and friendGroup != '' "> and friend_group = #{friendGroup}</if>
+             <if test="friendRemark != null  and friendRemark != '' "> and friend_remark = #{friendGroup}</if>
+             <if test="createBy != null  and createBy != '' "> and create_by = #{createBy}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+             <if test="updateBy != null  and updateBy != '' "> and update_by = #{updateBy}</if>
+             <if test="updateTime != null "> and update_time = #{updateTime}</if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+            </if>
+           AND del_flag = '0'
+         </where>
+    </select>
+    
+    <select id="selectFriendById" parameterType="Integer" resultMap="FriendResult">
+        <include refid="selectFriendVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertFriend" parameterType="Friend">
+        insert into cap_friend
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null  ">id,</if>
+			<if test="userId != null  ">user_id,</if>
+			<if test="userGroup != null  and userGroup != ''  ">user_group,</if>
+			<if test="friendId != null  ">friend_id,</if>
+			<if test="friendGroup != null  and friendGroup != ''  ">friend_group,</if>
+			<if test="friendRemark != null  and friendRemark != ''  ">friend_remark,</if>
+			<if test="createBy != null  and createBy != ''  ">create_by,</if>
+			create_time
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null  ">#{id},</if>
+			<if test="userId != null  ">#{userId},</if>
+			<if test="userGroup != null  and userGroup != ''  ">#{userGroup},</if>
+			<if test="friendId != null  ">#{friendId},</if>
+			<if test="friendGroup != null  and friendGroup != ''  ">#{friendGroup},</if>
+            <if test="friendRemark != null  and friendRemark != ''  ">#{friendRemark},</if>
+			<if test="createBy != null  and createBy != ''  ">#{createBy},</if>
+            sysdate()
+         </trim>
+    </insert>
+	 
+    <update id="updateFriend" parameterType="Friend">
+        update cap_friend
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null  ">user_id = #{userId},</if>
+            <if test="userGroup != null  and userGroup != ''  ">user_group = #{userGroup},</if>
+            <if test="friendId != null  ">friend_id = #{friendId},</if>
+            <if test="friendGroup != null  and friendGroup != ''  ">friend_group = #{friendGroup},</if>
+            <if test="friendRemark != null  and friendRemark != ''  ">friend_remark = #{friendRemark},</if>
+            <if test="updateBy != null  and updateBy != ''  ">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteFriendById" parameterType="Integer">
+        update cap_friend set del_flag = '2' where id = #{id}
+    </delete>
+	
+    <delete id="deleteFriendByIds" parameterType="String">
+        update cap_friend set del_flag = '2' where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

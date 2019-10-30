@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>添加好友</title>
+    <link rel="shortcut icon" href="favicon.ico">
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+    <link th:href="@{/css/font-awesome.min.css}" rel="stylesheet"/>
+    <link th:href="@{/css/animate.css}" rel="stylesheet"/>
+    <link th:href="@{/css/style.css}" rel="stylesheet"/>
+</head>
+
+<body class="gray-bg">
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-4" th:each="user:${userList}">
+                <div class="contact-box">
+                    <a href="#">
+                        <div class="col-sm-4">
+                            <div class="text-center">
+                                <img alt="image" class="img-circle m-t-xs img-responsive" th:src="(${user.avatar} == '') ? @{/img/profile.jpg} : @{/profile/avatar/} + ${user.avatar}" >
+                            </div>
+                        </div>
+                        <div class="col-sm-8">
+                            <h3><strong>[[${user.loginName}]]</strong></h3>
+                            <p><i class="fa fa-map-marker"></i> [[${user.school}]]</p>
+                            <address>
+                            <strong>[[${user.sex}]]</strong><br>
+                             E-mail:[[${user.email}]]<br>
+                            <abbr title="Phone">Tel:</abbr> [[${user.phonenumber}]]
+                        </address>
+                        </div>
+                        <div class="clearfix">
+                            <div class="pull-right">
+                                <a class="btn btn-xs btn-primary"  th:value="${user.userId}" onclick="addFriend(this)"><i class="fa far-heart-o"></i>添加好友</a>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 全局js -->
+    <script th:src="@{/js/jquery.min.js}"></script>
+    <script th:src="@{/js/bootstrap.min.js}"></script>
+    <script th:src="@{/ajax/libs/layer/layer.min.js}"></script>
+    <script th:src="@{/ajax/libs/layui/layui.js}"></script>
+    <script th:src="@{/ruoyi/js/ry-ui.js?v=3.2.0}"></script>
+    <script th:inline="javascript">
+        var ctx = [[@{
+            /}]];
+        $(function () {
+            $('.contact-box').each(function () {
+                animationHover(this, 'pulse');
+            });
+        });
+        function addFriend(obj) {
+            var friendId = $(obj).attr("value");
+            $.ajax({
+                type: "post",
+                dataType: "json",
+                url: ctx + "system/user/addFriends",
+                data: {
+                    "friendId": friendId
+                },
+                success: function (r) {
+                    if (r.code == 0) {
+                        $.modal.msg(r.msg);
+                    } else {
+                        $.modal.closeLoading();
+                        $.modal.msg(r.msg);
+                    }
+                }
+            });
+        }
+        //animation.css
+        function animationHover(element, animation) {
+            element = $(element);
+            element.hover(
+                function () {
+                    element.addClass('animated ' + animation);
+                },
+                function () {
+                    //动画完成之前移除class
+                    window.setTimeout(function () {
+                        element.removeClass('animated ' + animation);
+                    }, 2000);
+                });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人资料</title>
+    <link rel="shortcut icon" href="favicon.ico">
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+    <link th:href="@{/css/font-awesome.min.css}" rel="stylesheet"/>
+    <link th:href="@{/css/animate.css}" rel="stylesheet"/>
+    <link th:href="@{/css/style.css}" rel="stylesheet"/>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="row animated fadeInRight">
+        <div class="col-sm-4">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>个人资料</h5>
+                    <div class="ibox-tools">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="profile.html#">
+                            <i class="fa fa-edit"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-user">
+                            <li><a href="javascript:edit()">完善信息</a></li>
+                            <li><a href="javascript:resetPwd()">修改密码</a></li>
+                            <li><a href="javascript:avatar()">修改头像</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div>
+                    <div class="ibox-content no-padding border-left-right">
+                        <img th:src="(${user.avatar} == '') ? @{/img/profile.jpg} : @{/profile/avatar/} + ${user.avatar}"
+                             alt="image" class="img-responsive">
+                    </div>
+                    <div class="ibox-content profile-content">
+                        <h4><strong>[[${user.loginName}]]</strong></h4>
+                        <p><i class="fa fa-transgender"></i> 性别：[[${user.sex}]]</p>
+                        <p><i class="fa fa-map-marker"></i>   学校： [[${user.school}]]</p>
+                        <h5>
+                            关于我
+                        </h5>
+                        <p>
+                            [[${user.remark}]]
+                        </p>
+                        <div class="row m-t-lg">
+                            <div class="col-sm-4">
+                                <span class="bar">5,3,9,6,5,9,7,3,5,2</span>
+                                <h5><strong>[[${noticeSize}]]</strong> 我的动态</h5>
+                            </div>
+                            <div class="col-sm-4">
+                                <span class="line">5,3,9,6,5,9,7,3,5,2</span>
+                                <h5><strong>[[${friendsSize}]]</strong> 我的好友</h5>
+                            </div>
+                            <div class="col-sm-4">
+                                <span class="bar">5,3,2,-1,-3,-2,2,3,5,2</span>
+                                <h5><strong>[[${addMeSize}]]</strong>加我的人</h5>
+                            </div>
+                        </div>
+                        <div class="user-button">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <button type="button" id="publishDynamic" class="btn btn-primary btn-sm btn-block">
+                                        <i class="fa fa-envelope"></i> 发表动态
+                                    </button>
+                                </div>
+                                <div class="col-sm-6">
+                                    <button type="button" class="btn btn-danger btn-sm btn-block" id="addFriends"><i
+                                            class="fa fa-coffee"></i> 加好友
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-8">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>最新动态</h5>
+                    <div class="ibox-tools">
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="social-feed-separated" th:each="notice : ${notices}">
+                        <div class="social-avatar">
+                            <a href="">
+                                <img alt="image" th:src="(${notice.avatar} == '') ? @{/img/profile.jpg} : @{/profile/avatar/} + ${notice.avatar}">
+                            </a>
+                        </div>
+                        <div class="social-feed-box">
+                            <div class="social-avatar">
+                                <a href="#">
+                                    [[${notice.createBy}]]
+                                </a>
+                                <small class="text-muted">[[${#dates.format(notice.createTime, 'yyyy-MM-dd HH:mm')}]]</small>
+                            </div>
+                            <div class="social-body">
+                                <p th:utext="${notice.noticeContent}"></p>
+                                <div class="btn-group">
+                                    <button th:if="${notice.noticeType=='3'}" class="btn btn-white btn-xs" id="comment" th:value="${notice.noticeId}" onclick="comment(this)"><i class="fa fa-comments"></i> 评论</button>
+                                </div>
+                            </div>
+                            <div class="social-footer">
+                                <div class="social-comment" th:each="comment:${notice.comments}">
+                                    <a href="" class="pull-left">
+                                        <img alt="image" th:src="(${comment.avatar} == '') ? @{/img/profile.jpg} : @{/profile/avatar/} + ${comment.avatar}">
+                                    </a>
+                                    <div class="media-body">
+                                        <a href="#">
+                                            [[${comment.createBy}]]
+                                        </a>  [[${comment.content}]]
+                                        <br/>
+                                        <small class="text-muted">[[${#dates.format(comment.createTime, 'yyyy-MM-dd HH:mm')}]]</small>
+                                    </div>
+
+                                    <div class="social-comment" th:if="${comment.replySign==2}">
+                                        <a href="" class="pull-left">
+                                            <img alt="image" th:src="(${comment.avatar} == '') ? @{/img/profile.jpg} : @{/profile/avatar/} + ${comment.avatar}">
+                                        </a>
+                                        <div class="media-body">
+                                            <a href="#">
+                                                [[${comment.createBy}]]
+                                            </a> [[${comment.content}]]
+                                            <br/>
+                                            <small class="text-muted">[[${#dates.format(comment.createTime, 'yyyy-MM-dd HH:mm')}]]</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 全局js -->
+<script th:src="@{/js/jquery.min.js}"></script>
+<script th:src="@{/js/bootstrap.min.js}"></script>
+<!-- Peity -->
+<script th:src="@{/ajax/libs/peity/jquery.peity.min.js}"></script>
+<script th:src="@{/ajax/libs/peity/peity-demo.js}"></script>
+<script th:src="@{/ajax/libs/layer/layer.min.js}"></script>
+<script th:src="@{/ajax/libs/layui/layui.js}"></script>
+<script th:src="@{/ruoyi/js/ry-ui.js?v=3.2.0}"></script>
+<script th:src="@{/ruoyi/js/common.js?v=3.2.0}"></script>
+<script th:inline="javascript">
+    var ctx = [[@{
+        /}]];
+        var url = ctx + 'system/notice/add';
+        var addFriUrl = ctx + 'system/user/addFriends';
+        $(function () {
+            $("#publishDynamic").click(function () {
+                $.modal.open("发表动态", url, '800', '500');
+            });
+            $("#addFriends").click(function () {
+                $.modal.openTab("添加好友", addFriUrl);
+                // $.modal.open("发表动态", addFriUrl, '800', '500');
+            });
+        })
+        function comment(obj) {
+            var commentUrl = ctx + "system/comment/add";
+            var noticeId = $(obj).attr("value");
+            commentUrl = commentUrl + '?noticeId=' + noticeId;
+            $.modal.open("发表评论", commentUrl, '400', '400');
+        }
+        /*用户信息-修改*/
+        function edit() {
+            var url = ctx + 'system/user/profile/edit';
+            $.modal.open("修改用户", url);
+        }
+
+        /*用户管理-重置密码*/
+        function resetPwd() {
+            var url = ctx + 'system/user/profile/resetPwd';
+            $.modal.open("重置密码", url, '800', '500');
+        }
+
+        /*用户管理-头像*/
+        function avatar() {
+            var url = ctx + 'system/user/profile/avatar';
+            $.modal.open("修改头像", url);
+        }
+</script>
+</body>
+
+</html>
